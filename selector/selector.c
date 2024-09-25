@@ -15,7 +15,6 @@
 #include <fcntl.h>
 
 #include "selector.h"
-#include "utils.h"
 
 struct selector_elm {
 	TAILQ_ENTRY(selector_elm) queue;
@@ -25,6 +24,7 @@ struct selector_elm {
 	struct termios tty;
 	long timeout;
 	int (*callback)(int, int, void *);
+	int (*rd_cb)(int, void *, int, void *);
 	void *context;
 	selector_buf_t rd, wr;
 };
@@ -89,8 +89,10 @@ static int selector_write_cb(struct selector_elm *elm)
 	}
 
 	n = write(elm->fd, elm->wr.buf + elm->wr.offt, n);
-	if (n <= 0)
+	if (n <= 0) {
+		elm->wr.offt = elm->wr.size = 0;
 		return -1;
+	}
 
 	elm->wr.offt += n;
 	elm->wr.bytes += n;
@@ -112,7 +114,10 @@ static int selector_read_cb(struct selector_elm *elm)
 	if (n == 0)
 		return elm->rd.offt;
 
-	n = read(elm->fd, buf, n);
+	if (elm->rd_cb)
+		n = elm->rd_cb(elm->fd, buf, n, elm->context);
+	else
+		n = read(elm->fd, buf, n);
 
 	if (n <= 0) /* Close connection */
 		return n;
@@ -211,6 +216,17 @@ int selector_write(struct selector *sel, int fd, const void *buf, size_t size)
 	return size;
 }
 
+int selector_write_arm(struct selector *sel, int fd)
+{
+	struct selector_elm *elm = selector_search(sel, fd);
+
+	if (!elm)
+		return -1;
+
+	elm->wr.size = elm->wr.offt = 1;
+	return 0;
+}
+
 /*
  *  set file descriptor buffer pointer and size for read callback
  */
@@ -225,6 +241,17 @@ int selector_read(struct selector *sel, int fd, void *buf, size_t size)
 	elm->rd.size = size;
 	elm->rd.offt = 0;
 	return size;
+}
+
+int selector_set_read_cb(struct selector *sel, int fd, int (*cb)(int, void *, int, void *))
+{
+	struct selector_elm *elm = selector_search(sel, fd);
+
+	if (!elm)
+		return -1;
+
+	elm->rd_cb = cb;
+	return 0;
 }
 
 /*

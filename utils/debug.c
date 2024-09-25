@@ -8,9 +8,9 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define DEBUG
 #include "debug.h"
 
+#ifdef DEBUG
 static FILE *dbgio = NULL;
 
 void dbgts(const char *fmt, ...)
@@ -29,12 +29,12 @@ void dbgts(const char *fmt, ...)
 	t = tv.tv_sec;
 	localtime_r(&t, &tm);
 	dbuf[0] = '\0';
-	strftime(dbuf, sizeof(dbuf), "%b %d %Y %H:%M:%S", &tm);
+	strftime(dbuf, sizeof(dbuf), "%b %d %Y %2H:%2M:%2S", &tm);
 	n = strlen(dbuf);
 	if (n > 0)
-		dbuf[n - 1] = '\0';
+		dbuf[n] = '\0';
 
-	fprintf(dbgio, "%s.%03ld: ", dbuf, tv.tv_usec / 1000);
+	fprintf(dbgio, "%s.%.03ld: ", dbuf, tv.tv_usec / 1000);
 	va_start(ap, fmt);
 	vfprintf(dbgio, fmt, ap);
 	va_end(ap);
@@ -48,3 +48,4 @@ void dbg_set_pipe(FILE *pipe)
 {
 	dbgio = pipe;
 }
+#endif

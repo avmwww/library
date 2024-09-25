@@ -35,7 +35,11 @@ int selector_read(struct selector *sel, int fd, void *buf, size_t size);
 
 int selector_write(struct selector *sel, int fd, const void *buf, size_t size);
 
+int selector_write_arm(struct selector *sel, int fd);
+
 int selector_set_raw(struct selector *sel, int fd, int raw);
+
+int selector_set_read_cb(struct selector *sel, int fd, int (*cb)(int, void *, int, void *));
 
 struct selector *selector_create(void);
 

@@ -3,8 +3,21 @@
  */
 
 #include <getopt.h>
+#include <string.h>
+#include <stdio.h>
 
 #include"progopt.h"
+
+void prog_option_dump(struct prog_option *popt)
+{
+	printf("PROG OPTIONS\n");
+	printf("\tShort: %c(0x%02x)\n", popt->opshort, popt->opshort);
+	printf("\tLong: %s\n", popt->oplong);
+	printf("\tDescription: %s\n", popt->desc);
+	printf("\tType: %d\n", popt->type);
+	printf("\tOffset: %ld\n", popt->offt);
+	printf("\tValue: %d\n", popt->set);
+}
 
 int prog_option_make(struct prog_option *popt, struct option *opt,
 		     char *optstr, int len)
@@ -39,6 +52,27 @@ int prog_option_make(struct prog_option *popt, struct option *opt,
 	return 0;
 }
 
+static int prog_option_get(struct prog_option *popt, char *arg, void *ctx)
+{
+	switch (popt->type) {
+		case OPT_INT:
+			*((int *)(ctx + popt->offt)) = strtol(arg, NULL, 10);
+			break;
+		case OPT_HEX:
+			*((int *)(ctx + popt->offt)) = strtol(arg, NULL, 0);
+			break;
+		case OPT_STRING:
+			*((char **)(ctx + popt->offt)) = arg;
+			break;
+		case OPT_NO:
+			*((int *)(ctx + popt->offt)) = popt->set;
+			break;
+		default:
+			return -1;
+	}
+	return 0;
+}
+
 int prog_option_load(int argc, char * const argv[],
 		     struct prog_option *popt, struct option *opt,
 		     const char *optstr, void *ctx)
@@ -50,27 +84,23 @@ int prog_option_load(int argc, char * const argv[],
 	while ((c = getopt_long(argc, argv, optstr, opt, &optindex)) != -1) {
 		p = popt;
 		while (p->type != OPT_END) {
+#if 0
+			printf("getopt_long return %02x(%d), index %d\n", c, c, optindex);
+#endif
 			if (c == 0) {
+#if 0
+				prog_option_dump(p);
+#endif
 				/* long option returned */
-				//p = opt[optindex];
-			}
-			if (p->opshort == c) {
-				switch (p->type) {
-					case OPT_INT:
-						*((int *)(ctx + p->offt)) = strtol(optarg, NULL, 10);
-						break;
-					case OPT_HEX:
-						*((int *)(ctx + p->offt)) = strtol(optarg, NULL, 0);
-						break;
-					case OPT_STRING:
-						*((char **)(ctx + p->offt)) = optarg;
-						break;
-					case OPT_NO:
-						*((int *)(ctx + p->offt)) = p->set;
-						break;
-					default:
-						break;
+				if (!strcmp(opt[optindex].name, p->oplong)) {
+#if 0
+					printf("Long option: %s, index %d\n", opt[optindex].name, optindex);
+#endif
+					prog_option_get(p, optarg, ctx);
+					break;
 				}
+			} else if (p->opshort == c) {
+				prog_option_get(p, optarg, ctx);
 				break;
 			}
 			p++;

@@ -43,6 +43,15 @@ static int selector_net_write_cb(struct selector_net *sn, int size)
 	return 0;
 }
 
+static int selector_net_read_data(int s, void *buf, int size, void *arg)
+{
+	struct selector_net *sn = arg;
+	int n;
+
+	n = recvfrom(s, buf, size, 0, (struct sockaddr *)NULL, NULL);
+	return n;
+}
+
 static int selector_net_callback(int ev, int size, void *arg)
 {
 	struct selector_net *sn = arg;
@@ -137,6 +146,9 @@ int selector_net_connect(struct selector_net *sn)
 	if (selector_add(sn->sel, s, selector_net_callback, sn) < 0) {
 		close(s);
 		return -1;
+	}
+	if (type == SOCK_DGRAM) {
+		selector_set_read_cb(sn->sel, s, selector_net_read_data);
 	}
 	sn->fd = s;
 

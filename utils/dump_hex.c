@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -11,7 +12,7 @@
 /*
  *
  */
-void dump_hex(const void *buf, size_t size, int asc)
+void dump_hex_prefix(const char *prefix, const void *buf, size_t size, int asc)
 {
 	const uint8_t *p = (const uint8_t *)buf;
 	int i = 0;
@@ -19,6 +20,9 @@ void dump_hex(const void *buf, size_t size, int asc)
 
 	memset(ascbuf, 0, sizeof(ascbuf));
 	while (size-- > 0) {
+		if (i == 0) {
+			printf("%s ", prefix);
+		}
 		if (asc) {
 			if (isprint(*p))
 				ascbuf[i] = *p;
@@ -44,3 +48,7 @@ void dump_hex(const void *buf, size_t size, int asc)
 	}
 }
 
+void dump_hex(const void *buf, size_t size, int asc)
+{
+	dump_hex_prefix(NULL, buf, size, asc);
+}
