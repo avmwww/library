@@ -21,7 +21,8 @@ void dump_hex_prefix(const char *prefix, const void *buf, size_t size, int asc)
 	memset(ascbuf, 0, sizeof(ascbuf));
 	while (size-- > 0) {
 		if (i == 0) {
-			printf("%s ", prefix);
+			if (prefix)
+				printf("%s ", prefix);
 		}
 		if (asc) {
 			if (isprint(*p))

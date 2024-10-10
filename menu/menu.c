@@ -3,6 +3,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "menu.h"
 #include "zalloc.h"
@@ -14,17 +15,37 @@
 #define menu_elm_first(e)	((e)->prev == NULL)
 #define menu_elm_last(e)	((e)->next == NULL)
 
-menuq_t *menu_elm_create(unsigned int data_len)
+static menuq_t *menu_last_x(menuq_t *m)
 {
-	menuq_t *elm;
+	while (m->x.next)
+		m = m->x.next;
 
-	elm = zalloc(sizeof(menuq_t) + data_len);
-	if (!elm)
-		return NULL;
+	return m;
+}
 
-	elm->data_len = data_len;
+/*
+ *
+ */
+int menu_elm_add(menuq_t *menu, menuq_t *elm)
+{
+	menuq_t *y, *x;
 
-	return elm;
+	if (!menu || !elm)
+		return -1;
+
+	if (elm->y.prev || elm->y.next)
+		return -1;
+
+	y = menu->y.next;
+
+	if (!y) {
+		menu->y.next = elm;
+	} else {
+		x = menu_last_x(y);
+		x->x.next = elm;
+	}
+
+	return 0;
 }
 
 void menu_elm_destroy(menuq_t *elm)
@@ -56,8 +77,58 @@ void menu_elm_destroy(menuq_t *elm)
 	if (elm->info.name)
 		free(elm->info.name);
 
+	if (elm->data && elm->data_len)
+		free(elm->data);
+
 	/* remove this entry */
 	free(elm);
 }
 
+menuq_t *menu_elm_create(void *data, unsigned int data_len)
+{
+	menuq_t *elm;
+
+	elm = zalloc(sizeof(menuq_t));
+	if (!elm)
+		return NULL;
+
+	if (!data && data_len != 0) {
+		data = zalloc(data_len);
+		if (!data) {
+			free(elm);
+			return NULL;
+		}
+	} else
+		data_len = 0;
+
+	elm->data = data;
+	elm->data_len = data_len;
+
+	return elm;
+}
+
+menuq_t *menu_elm_create_and_add(menuq_t *menu, void *data, unsigned int data_len)
+{
+	menuq_t *elm;
+	
+	elm = menu_elm_create(data, data_len);
+	if (!elm)
+		return NULL;
+
+	if (menu_elm_add(menu, elm) < 0) {
+		menu_elm_destroy(elm);
+		return NULL;
+	}
+	return elm;
+}
+
+int menu_elm_init(menuq_t *elm)
+{
+	if (!elm)
+		return -1;
+
+	memset(elm, 0, sizeof(menuq_t));
+
+	return 0;
+}
 

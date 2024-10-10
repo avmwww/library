@@ -8,6 +8,12 @@
 
 #include"progopt.h"
 
+#ifdef __MINGW32__
+#define PRI_L ""
+#else
+#define PRI_L "l"
+#endif
+
 void prog_option_dump(struct prog_option *popt)
 {
 	printf("PROG OPTIONS\n");
@@ -15,7 +21,7 @@ void prog_option_dump(struct prog_option *popt)
 	printf("\tLong: %s\n", popt->oplong);
 	printf("\tDescription: %s\n", popt->desc);
 	printf("\tType: %d\n", popt->type);
-	printf("\tOffset: %ld\n", popt->offt);
+	printf("\tOffset: %" PRI_L "d\n", popt->offt);
 	printf("\tValue: %d\n", popt->set);
 }
 
