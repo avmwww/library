@@ -14,6 +14,10 @@ void dbgts(const char *fmt, ...);
 
 void dbg_set_pipe(FILE *pipe);
 
+#ifndef DEBUG_PREFIX
+# define DEBUG_PREFIX
+#endif
+
 # define dbg(fmt, ...)		printf(DEBUG_PREFIX fmt "\n", ## __VA_ARGS__ )
 # define dbg_dump_hex		dump_hex
 #else
