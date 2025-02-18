@@ -45,7 +45,8 @@ static int selector_net_write_cb(struct selector_net *sn, int size)
 
 static int selector_net_read_data(int s, void *buf, int size, void *arg)
 {
-	struct selector_net *sn = arg;
+	/*struct selector_net *sn = arg;*/
+	(void)arg;
 	int n;
 
 	n = recvfrom(s, buf, size, 0, (struct sockaddr *)NULL, NULL);
@@ -55,7 +56,7 @@ static int selector_net_read_data(int s, void *buf, int size, void *arg)
 static int selector_net_callback(int ev, int size, void *arg)
 {
 	struct selector_net *sn = arg;
-	int err;
+	int err = -1;
 
 	if (ev == SELECTOR_READ) {
 		err = selector_net_read_cb(sn, size);
