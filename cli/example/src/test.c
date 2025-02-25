@@ -74,6 +74,9 @@ int main(int argc, char **argv)
 	/* enable command completion */
 	cli_set_completion(ctx.cli, ctx.fd, 1);
 
+	/* redraw */
+	cli_send_redraw(ctx.cli, ctx.fd);
+
 	on_exit(test_exit, &ctx);
 
 	while (selector_exec(ctx.sel) != -1) {

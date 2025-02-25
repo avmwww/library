@@ -42,6 +42,10 @@ int cli_cmd_register(struct cli *cli, const char *name,
 
 int cli_send(struct cli *cli, int fd, const void *s, size_t size);
 
+int cli_send_redraw(struct cli *cli, int fd);
+
+int cli_send_telnet_negotiation(struct cli *cli, int fd);
+
 #define CLI_EXIT		(-10)
 #define CLI_ERROR		(-1)
 #define CLI_OK			0

@@ -1065,6 +1065,28 @@ int cli_set_callback(struct cli *cli, int fd,
 	return 0;
 }
 
+int cli_send_telnet_negotiation(struct cli *cli, int fd)
+{
+	struct cliq *cq;
+
+	cq = cli_search(cli, fd);
+	if (!cq)
+		return -1;
+
+	return cli_telnet_negotiate(cq);
+}
+
+int cli_send_redraw(struct cli *cli, int fd)
+{
+	struct cliq *cq;
+
+	cq = cli_search(cli, fd);
+	if (!cq)
+		return -1;
+
+	return cli_redraw(cq);
+}
+
 int cli_set_prompt(struct cli *cli, const char *prompt)
 {
 	if (cli->prompt)
@@ -1140,10 +1162,6 @@ int cli_connect(struct cli *cli, struct selector *sel, int fd, int fdout)
 	}
 
 	selector_set_raw(cq->sel, fd, 1);
-
-	cli_telnet_negotiate(cq);
-
-	cli_redraw(cq);
 
 	return 0;
 }
