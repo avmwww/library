@@ -38,4 +38,6 @@ int prog_option_load(int argc, char * const argv[],
 
 void prog_option_printf(FILE *out, struct prog_option *opt);
 
+void prog_option_dump(struct prog_option *popt);
+
 #endif
