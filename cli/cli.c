@@ -134,7 +134,7 @@ static int cli_history_add(struct cliq *cq, char *str)
 
 	memset(chq, 0, sizeof(struct cli_historyq));
 	
-	chq->str = strdup(str);
+	chq->str = strndup(str, CLI_CMD_NAME_MAX);
 	if (!chq->str) {
 		free(chq);
 		return -1;
@@ -196,13 +196,18 @@ static int cli_cmd_add(struct cli *cli, const char *name,
 		int (*handler)(void *, int, char **, void *), void *context,
 		const char *help)
 {
-	struct cli_cmdq *cmdq = malloc(sizeof(struct cli_cmdq));
+	struct cli_cmdq *cmdq;
+
+	if (!name || !cli)
+		return -1;
+
+	cmdq = malloc(sizeof(struct cli_cmdq));
 
 	if (!cmdq)
 		return -1;
 
 	memset(cmdq, 0, sizeof(struct cli_cmdq));
-	cmdq->name = strdup(name);
+	cmdq->name = strndup(name, CLI_CMD_NAME_MAX);
 
 	if (!cmdq->name) {
 		free(cmdq);
@@ -210,7 +215,7 @@ static int cli_cmd_add(struct cli *cli, const char *name,
 	}
 
 	if (help) {
-		cmdq->help = strdup(help);
+		cmdq->help = strndup(help, CLI_CMD_NAME_MAX);
 		if (!cmdq->help) {
 			free(cmdq->name);
 			free(cmdq);
@@ -1092,7 +1097,7 @@ int cli_set_prompt(struct cli *cli, const char *prompt)
 	if (cli->prompt)
 		free(cli->prompt);
 
-	cli->prompt = strdup(prompt);
+	cli->prompt = strndup(prompt, CLI_CMD_NAME_MAX);
 	if (cli->prompt == NULL)
 		return -1;
 

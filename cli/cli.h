@@ -53,4 +53,6 @@ int cli_send_telnet_negotiation(struct cli *cli, int fd);
 #define CLI_INVALID_ARG		9
 #define CLI_UNKNOWN_CMD		10
 
+#define CLI_CMD_NAME_MAX	4096
+
 #endif
