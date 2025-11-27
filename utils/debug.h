@@ -31,8 +31,10 @@ void dbg_set_pipe(FILE *pipe);
 
 #ifdef VERBOSE_DEBUG
 # define vdbg		dbg
+# define vdbgts		dbgts
 #else
 # define vdbg(fmt, ...)
+# define vdbgts(fmt, ...)
 #endif
 
 #endif

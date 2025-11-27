@@ -18,6 +18,7 @@ struct prog_option {
 		OPT_INT,
 		OPT_HEX,
 		OPT_STRING,
+		OPT_BOOL,
 		OPT_END = -1,
 	} type;
 	size_t offt;

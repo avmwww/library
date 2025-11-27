@@ -5,6 +5,8 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <strings.h>
 
 #include"progopt.h"
 
