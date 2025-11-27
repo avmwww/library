@@ -1,10 +1,11 @@
 /*
- *
+ * Serial for posix systems
  */
 
 #ifndef _SERIAL_H_
 #define _SERIAL_H_
 
+#define SERIAL_HANDLE_INVALID		(-1)
 typedef int serial_handle;
 
 serial_handle serial_open(const char *path);

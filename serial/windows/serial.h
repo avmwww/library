@@ -1,11 +1,13 @@
 /*
- *
+ * Serial for windows system
  */
 
 #ifndef _SERIAL_H_
 #define _SERIAL_H_
 
 #include <windows.h>
+
+#define SERIAL_HANDLE_INVALID		INVALID_HANDLE_VALUE
 
 typedef HANDLE serial_handle;
 
